@@ -210,7 +210,7 @@ var express = require("express");
 const path = require('path');
 var sqlite = require("sqlite");
 var ejs = require("ejs");
-//var cors = require("cors");
+var cors = require("cors");
 
 /*import { express } from "express";
 import { sqlite } from "sqlite";
@@ -239,7 +239,7 @@ CREATE TABLE "Stocks" (
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
-app.get('/api/name/:symbol', async (req, res, next) => {
+app.get('/api/name/:symbol', cors(), async (req, res, next) => {
   try {
     const db = await dbPromise;
     const [name] = await Promise.all([
@@ -252,7 +252,7 @@ app.get('/api/name/:symbol', async (req, res, next) => {
   }
 });
 
-app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', async (req, res, next) => 
+app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', cors(), async (req, res, next) => 
 	{
 	try 
 		{
@@ -271,7 +271,7 @@ app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', async (req
 	}
 });
 
-app.get('/api/results/:column/:order', async (req, res, next) => {
+app.get('/api/results/:column/:order', cors(), async (req, res, next) => {
   try {
     const db = await dbPromise;
     const [stocks] = await Promise.all([
