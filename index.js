@@ -210,9 +210,15 @@ var express = require("express");
 const path = require('path');
 var sqlite = require("sqlite");
 var ejs = require("ejs");
-const cors = require('cors');
+//var cors = require("cors");
 
+/*import { express } from "express";
+import { sqlite } from "sqlite";
+import { ejs } from "ejs";
+import { cors } from "cors";
+*/
 const app = express();
+//app.use(cors());
 
 const dbPromise = sqlite.open('./database.sqlite', { Promise });
 
@@ -228,15 +234,13 @@ CREATE TABLE "Stocks" (
 	PRIMARY KEY("symbol")
 );*/
 
+//app.engine('html', require('ejs').renderFile);
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
-/*
-app.get('/', cors(), function (req, res) {
-   res.redirect('/api/results/profitloss/desc');
-});
- */
-app.get('/api/name/:symbol', cors(), async (req, res, next) => {
+app.use("/public", express.static(__dirname + '/public'));
+ 
+app.get('/api/name/:symbol', async (req, res, next) => {
   try {
     const db = await dbPromise;
     const [name] = await Promise.all([
@@ -249,7 +253,7 @@ app.get('/api/name/:symbol', cors(), async (req, res, next) => {
   }
 });
 
-app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', cors(), async (req, res, next) => 
+app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', async (req, res, next) => 
 	{
 	try 
 		{
@@ -268,7 +272,7 @@ app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', cors(), as
 	}
 });
 
-app.get('/api/results/:column/:order', cors(), async (req, res, next) => {
+app.get('/api/results/:column/:order', async (req, res, next) => {
   try {
     const db = await dbPromise;
     const [stocks] = await Promise.all([
@@ -282,13 +286,11 @@ app.get('/api/results/:column/:order', cors(), async (req, res, next) => {
   }
 });
 
-// Serve static files from the React frontend app
-app.use(express.static(path.join(__dirname + '/client/public')));
-
-// Anything that doesn't match the above, send back index.html
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/public/index.html'))
-})
+  res.sendFile(path.join(__dirname+'/client/public/index.html'));
+});
 
 const port = process.env.PORT || 5000;
 app.listen(port);
