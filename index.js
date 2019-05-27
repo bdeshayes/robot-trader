@@ -210,15 +210,8 @@ var express = require("express");
 const path = require('path');
 var sqlite = require("sqlite");
 var ejs = require("ejs");
-//var cors = require("cors");
 
-/*import { express } from "express";
-import { sqlite } from "sqlite";
-import { ejs } from "ejs";
-import { cors } from "cors";
-*/
 const app = express();
-//app.use(cors());
 
 const dbPromise = sqlite.open('./database.sqlite', { Promise });
 
@@ -234,7 +227,6 @@ CREATE TABLE "Stocks" (
 	PRIMARY KEY("symbol")
 );*/
 
-//app.engine('html', require('ejs').renderFile);
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
