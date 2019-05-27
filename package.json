@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "cors": "^2.8.5",
     "ejs": "^2.6.1",
     "express": "^4.15.3",
     "sqlite": "^3.0.3"
@@ -11,6 +12,6 @@
   "homepage": ".",
   "scripts": {
     "start": "node index.js",
-  "heroku-postbuild": "cd client && yarn && yarn run build"
+    "heroku-postbuild": "cd client && yarn && yarn run build"
   }
 }

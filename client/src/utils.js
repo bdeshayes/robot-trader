@@ -76,7 +76,7 @@ fetch('/api/name/'+stockSymbol)
 
 document.title = stockSymbol;
 		
-	const promiseSTOCK = fetch('/public/stocks/'+stockSymbol+'.csv') 
+	const promiseSTOCK = fetch('/stocks/'+stockSymbol+'.csv') 
 		.then(response => response.text())
 		.then(data => csvParse(data, parseData(parseDate)))
 	return promiseSTOCK;
