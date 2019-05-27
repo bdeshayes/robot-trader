@@ -9,123 +9,6 @@ var nbstocks=0;
 var nbgains=0;
 var nblosses=0;
 
-var myStyle =
-`
-#Schlumpf {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-}
-#Schlumpf div {
-    margin: auto;
-    width: 50%;
-    text-align: center;
-    border: 3px solid green;
-    padding: 10px;
-}
-#tablehead {
-    margin: auto;
-    width: 50%;
-    text-align: center;
-}
-#Schlumpf table {
-    margin: auto;
-//    width: auto;
-    padding: 10px;
-} 
-#Schlumpf td, #Schlumpf th {
-    border: 1px solid #ddd;
-    padding: 8px;
-}
-
-#Schlumpf tr:nth-child(even){background-color: #f2f2f2;}
-
-#Schlumpf tr:hover {background-color: #ddd;}
-
-#Schlumpf th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #4CAF50;
-    color: white;
-}
-
-#content a, .menu a:link, .menu a:active, .menu a:visited 
-{
-text-decoration: none;
-}
-#content a:hover 
-{
-background-color: black;
-color: white;
-}
-.nav 
-{
-align: center;
-margin: 10px 10px;
-padding-top: 8px;
-padding-bottom: 10px;
-padding-left: 8px;
-background: none;
-}
-
-.nav li 
-{
-list-style-type: none;
-display: inline;
-padding: 10px 30px;
-background-color: #e67e22;
-margin-left: -11px;
-font-size: 120%;
-}
-
-.nav li:first-child
-{
-margin-left: 0;
-border-top-left-radius: 10px !important;
-border-bottom-left-radius: 10px !important;
-}
-
-.nav li:last-child
-{
-margin-right: 0px;
-border-top-right-radius: 10px !important;
-border-bottom-right-radius: 10px !important;
-}
-
-.nav a, .menu a:link, .menu a:active, .menu a:visited 
-{
-text-decoration: none;
-color: white;
-border-bottom: 0;
-padding: 10px 10px;
-}
-
-.nav a:hover 
-{
-text-decoration: none;
-background: #9b59b6;
-padding: 10px 10px;
-}
-
-ul.nav li a.current 
-{
-text-decoration: none;
-background: #e74c3c;
-padding: 10px 10px;
-}
-
-#footer
-{
-padding-top: 12px;
-padding-bottom: 12px;
-text-align: center;
-background-color: black;
-color: white;
-font-style: italic;
-font-weight: bold;
-}
-`;
 
 //##################################################
 //#                                                #
@@ -156,9 +39,11 @@ var html =
 <html>
 <head>
 <title>${title}</title>
-<style>
-${myStyle}
-</style>
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="/server.css" />
+
+<!-- now we can put cryptic html comments in the server page -->
 </head>
 <body>
 ${content}
@@ -177,9 +62,7 @@ return html;
 
 function RenderTable (stockarray)
 {
-	table = `<div id="tablehead"><img src="/public/robot.png" width="150 px"/><h2>Robot Trader</h2></div>`;
-	table += `<div id="content"><table id="Schlumpf">`;
-
+	table = `<div id="tablehead"><img src="/robot.png" width="150 px"/><h2>Robot Trader</h2></div>`;
 	table += '<table id="Schlumpf">\n';
 	table += '<tr><th><a href="/api/results/symbol/asc">Symbol</a></th>';
 	table += '<th>Name</th>';
@@ -210,17 +93,9 @@ var express = require("express");
 const path = require('path');
 var sqlite = require("sqlite");
 var ejs = require("ejs");
-var cors = require("cors");
 
-/*import { express } from "express";
-import { sqlite } from "sqlite";
-import { ejs } from "ejs";
-import { cors } from "cors";
-*/
 const app = express();
-//app.use(cors());
-//process.env.PWD = process.cwd();
-//console.log (process.env);
+
 const dbPromise = sqlite.open('./database.sqlite', { Promise });
 
 /*
@@ -235,11 +110,10 @@ CREATE TABLE "Stocks" (
 	PRIMARY KEY("symbol")
 );*/
 
-//app.engine('html', require('ejs').renderFile);
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
-app.get('/api/name/:symbol', cors(), async (req, res, next) => {
+app.get('/api/name/:symbol', async (req, res, next) => {
   try {
     const db = await dbPromise;
     const [name] = await Promise.all([
@@ -252,7 +126,7 @@ app.get('/api/name/:symbol', cors(), async (req, res, next) => {
   }
 });
 
-app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', cors(), async (req, res, next) => 
+app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', async (req, res, next) => 
 	{
 	try 
 		{
@@ -271,7 +145,7 @@ app.get('/api/result/:stock/:profitloss/:trades/:startdate/:enddate', cors(), as
 	}
 });
 
-app.get('/api/results/:column/:order', cors(), async (req, res, next) => {
+app.get('/api/results/:column/:order', async (req, res, next) => {
   try {
     const db = await dbPromise;
     const [stocks] = await Promise.all([
@@ -284,25 +158,27 @@ app.get('/api/results/:column/:order', cors(), async (req, res, next) => {
     next(err);
   }
 });
-/*
-process.env.PWD = process.cwd()
-at the very beginning of your web.js
-let you access files easily.
-You can do
-app.use('/heatcanvas',express.static(process.env.PWD+'/heatcanvas'));
-instead of using
-__dirname*/
 
-// Serve static files from the React frontend app
-//app.use(express.static(path.join(__dirname, 'client/public')))
+app.use('/stocks', express.static(__dirname + '/stocks'));
+
+let myENV = process.argv[2];
+
+// Serve static files for the React frontend app
+if (myENV === "DEV")
+	app.use(express.static(path.join(__dirname, 'client/public')));
+
+if (myENV === "PROD")
+	app.use(express.static(path.join(__dirname, 'client/build')));
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 
 // Anything that doesn't match the above, send back index.html
-/*app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/public/index.html'))
-})*/
+if (myENV === "DEV")
+	app.get('*', (req, res) => {res.sendFile(path.join(__dirname + '/client/public/index.html'))});
+
+if (myENV === "PROD")
+	app.get('*', (req, res) => {res.sendFile(path.join(__dirname + '/client/build/index.html'))});
 
 const port = process.env.PORT || 5000;
 app.listen(port);
