@@ -238,6 +238,10 @@ CREATE TABLE "Stocks" (
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
+app.get('/', function (req, res) {
+   res.redirect('/api/results/profitloss/desc');
+});
+
 app.use("/public", express.static(__dirname + '/public'));
  
 app.get('/api/name/:symbol', async (req, res, next) => {
@@ -288,9 +292,9 @@ app.get('/api/results/:column/:order', async (req, res, next) => {
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
-/*app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/public/index.html'));
-});*/
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/public/index.html'));
+});
 
 const port = process.env.PORT || 5000;
 app.listen(port);
