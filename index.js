@@ -230,9 +230,9 @@ CREATE TABLE "Stocks" (
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
-/*app.get('/', function (req, res) {
+app.get('/', function (req, res) {
    res.redirect('/api/results/profitloss/desc');
-});*/
+});
 
 app.use("/public", express.static(__dirname + '/public'));
  
