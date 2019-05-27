@@ -239,9 +239,10 @@ CREATE TABLE "Stocks" (
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
-//app.use("/public", express.static(__dirname + '/public'));
-app.use("/public", express.static(process.env.PWD + '/public'));
- 
+app.use("/public", express.static(__dirname + '/public'));
+//app.use("/public", express.static(process.env.PWD + '/public'));
+console.log ('__dirname = '+ __dirname);
+
 app.get('/api/name/:symbol', async (req, res, next) => {
   try {
     const db = await dbPromise;
@@ -299,8 +300,8 @@ __dirname*/
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-//  res.sendFile(path.join(__dirname+'/client/public/index.html'));
-  res.sendFile(path.join(process.env.PWD + '/client/public/index.html'));
+  res.sendFile(path.join(__dirname+'/client/public/index.html'));
+//  res.sendFile(path.join(process.env.PWD + '/client/public/index.html'));
 });
 
 const port = process.env.PORT || 5000;
