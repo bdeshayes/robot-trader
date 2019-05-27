@@ -219,6 +219,7 @@ import { cors } from "cors";
 */
 const app = express();
 //app.use(cors());
+process.env.PWD = process.cwd();
 
 const dbPromise = sqlite.open('./database.sqlite', { Promise });
 
@@ -238,7 +239,8 @@ CREATE TABLE "Stocks" (
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
-app.use("/public", express.static(__dirname + '/public'));
+//app.use("/public", express.static(__dirname + '/public'));
+app.use("/public", express.static(process.env.PWD + '/public'));
  
 app.get('/api/name/:symbol', async (req, res, next) => {
   try {
@@ -285,11 +287,20 @@ app.get('/api/results/:column/:order', async (req, res, next) => {
     next(err);
   }
 });
+/*
+process.env.PWD = process.cwd()
+at the very beginning of your web.js
+let you access files easily.
+You can do
+app.use('/heatcanvas',express.static(process.env.PWD+'/heatcanvas'));
+instead of using
+__dirname*/
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/public/index.html'));
+//  res.sendFile(path.join(__dirname+'/client/public/index.html'));
+  res.sendFile(path.join(process.env.PWD + '/client/public/index.html'));
 });
 
 const port = process.env.PORT || 5000;
