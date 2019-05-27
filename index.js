@@ -239,11 +239,6 @@ CREATE TABLE "Stocks" (
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
 
-//app.use("/public", express.static(__dirname + '/public'));
-app.use("/public", express.static(__dirname + '/build'));
-//app.use("/public", express.static(process.env.PWD + '/public'));
-console.log ('__dirname = '+ __dirname);
-
 app.get('/api/name/:symbol', async (req, res, next) => {
   try {
     const db = await dbPromise;
@@ -298,13 +293,16 @@ app.use('/heatcanvas',express.static(process.env.PWD+'/heatcanvas'));
 instead of using
 __dirname*/
 
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, 'client/build')))
+
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
+
+// Anything that doesn't match the above, send back index.html
 app.get('*', (req, res) => {
-//  res.sendFile(path.join(__dirname+'/client/public/index.html'));
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
-//  res.sendFile(path.join(process.env.PWD + '/client/public/index.html'));
-});
+  res.sendFile(path.join(__dirname + '/client/build/index.html'))
+})
 
 const port = process.env.PORT || 5000;
 app.listen(port);
