@@ -235,6 +235,7 @@ app.set('view engine', 'html');
 });*/
 
 app.use("/public", express.static(__dirname + '/public'));
+//app.use(express.static(path.join(__dirname, '/public')));
  
 app.get('/api/name/:symbol', async (req, res, next) => {
   try {
