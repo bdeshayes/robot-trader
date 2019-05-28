@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node index.js DEV",
-    "build": "node index.js PROD"
+    "build": "node index.js PROD",
     "heroku-postbuild": "cd client && yarn install && yarn run build"
   }
 }
