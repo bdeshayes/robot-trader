@@ -9,8 +9,7 @@
     "sqlite": "^3.0.3"
   },
   "scripts": {
-    "start": "node index.js DEV",
-    "build": "node index.js PROD",
+    "start": "node index.js",
     "heroku-postbuild": "cd client && yarn install && yarn run build"
   }
 }

@@ -283,25 +283,23 @@ app.get('/api/results/:column/:order', async (req, res, next) => {
 
 app.use('/stocks', express.static(__dirname + '/stocks'));
 
-let myENV = process.argv[2];
-
+let myENV = process.env.NODE_ENV; // process.argv[2]; // process.env.NODE_ENV=production
 // Serve static files for the React frontend app
-if (myENV === "DEV")
-	app.use(express.static(path.join(__dirname, 'client/public')));
 
-if (myENV === "PROD")
+if (myENV === "production")
 	app.use(express.static(path.join(__dirname, 'client/build')));
-
+else
+	app.use(express.static(path.join(__dirname, 'client/public')));
+	
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 
 // Anything that doesn't match the above, send back index.html
-if (myENV === "DEV")
-	app.get('*', (req, res) => {res.sendFile(path.join(__dirname + '/client/public/index.html'))});
-
-if (myENV === "PROD")
+if (myENV === "production")
 	app.get('*', (req, res) => {res.sendFile(path.join(__dirname + '/client/build/index.html'))});
-
+else
+	app.get('*', (req, res) => {res.sendFile(path.join(__dirname + '/client/public/index.html'))});
+	
 const port = process.env.PORT || 5000;
 app.listen(port);
 
