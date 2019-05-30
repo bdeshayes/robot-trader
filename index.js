@@ -8,6 +8,7 @@ const title = 'RobotTrader';
 var nbstocks=0;
 var nbgains=0;
 var nblosses=0;
+let myENV = process.env.NODE_ENV; // process.argv[2]; // process.env.NODE_ENV=production
 
 var myStyle =
 `
@@ -136,9 +137,12 @@ font-weight: bold;
 function DoFooter()
 {
 var comment = nbgains > nblosses ? "rocks!" : "sucks!";
-return `
-<div id="footer">${nbstocks} stocks counted, ${nbgains} gains, ${nblosses} losses, Wooa this robot really ${comment}</div>    
-`;
+var retval = `
+<div id="footer">${nbstocks} stocks counted, ${nbgains} gains, ${nblosses} losses, Whooah this robot really ${comment}</div><div style="text-align: center; top_margin: 10">`;
+
+if (myENV !== "production")
+	retval += '<br /><a href="/api/add">add a new stock</a><br />';
+return retval + '</div>';
 }
 
 //##################################################
@@ -147,20 +151,23 @@ return `
 //#                                                #
 //##################################################
 
-function RenderPage(content)
+function RenderPage(content, dofooter=true)
 {
-const footer = DoFooter();
+var footer='';
+
+if (dofooter)
+		footer = DoFooter();
+	
 var html =
 `
 <!DOCTYPE html>
 <html>
 <head>
 <title>${title}</title>
-<!--
-<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="/server.css" />
--->
-<!-- now we can put cryptic html comments in the server page -->
+
+<!-- now we can put cryptic html comments in the server page. -->
+
+<!-- Artificial intelligence is no match for natural stupidity. -->
 
 <style>
 ${myStyle}
@@ -189,6 +196,8 @@ function RenderTable (stockarray)
 	table += '<tr><th><a href="/api/results/symbol/asc">Symbol</a></th>';
 	table += '<th>Name</th>';
 	table += '<th><a href="/api/results/profitloss/desc">Profit %</a></th>';
+	if (myENV !== "production")
+		table += '<th></th>';
 	table += '<th><a href="/api/results/trades/asc">Trades</a></th>';
 	table += '<th>Start</th>';
 	table += '<th>End</th></tr>\n';
@@ -200,6 +209,8 @@ function RenderTable (stockarray)
 		table += `<td><a href="/?stock=${stock.symbol}">${stock.symbol}</a></td>`;
 		table += `<td>${stock.name}</td>`;
 		table += `<td>${stock.profitloss}</td>`;
+		if (myENV !== "production")
+			table += `<td><a OnClick="return confirm('Are you sure you want to delete the stock ${stock.symbol} ${stock.name}?');" href="/api/delete/${stock.symbol}">Delete</a></td>`;
 		table += `<td>${stock.trades}</td>`;
 		table += `<td>${stock.startdate}</td>`;
 		table += `<td>${stock.enddate}</td></tr>\n`;  
@@ -234,6 +245,12 @@ CREATE TABLE "Stocks" (
 
 app.engine('html', ejs.renderFile);
 app.set('view engine', 'html');
+
+const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+app.use(fileUpload());
 
 app.get('/api/name/:symbol', async (req, res, next) => {
   try {
@@ -281,9 +298,70 @@ app.get('/api/results/:column/:order', async (req, res, next) => {
   }
 });
 
+if (myENV !== "production")
+app.get('/api/delete/:stock', async (req, res, next) => {
+	try 
+		{
+		const db = await dbPromise;
+		const fs = require('fs');
+
+		await db.all(`delete from Stocks where symbol = '${req.params.stock}'`);
+		const [stocks] = await Promise.all([ db.all('SELECT * FROM Stocks') ]);
+
+		fs.unlinkSync(`./stocks/${req.params.stock}.csv`);
+		console.log('delete stock '+ req.params.stock);
+		
+		res.send(RenderPage(RenderTable(stocks)));
+		} 
+  catch (err) 
+	{
+    next(err);
+	}
+});
+
+if (myENV !== "production")
+app.get('/api/add', async (req, res, next) => {
+   const myform = `
+    <form "fileupload" action="/api/add" method="post" enctype="multipart/form-data">
+    <div  id="tablehead" >
+	<h2>Adding a new item to your stocklist</h2>
+	<p>Upload a csv file of some 200 daily quotes from <a target="_blank" href="https://finance.yahoo.com">finance.yahoo.com</a></p>
+	<table id="Schlumpf">
+	<tr><td>Symbol</td><td><input type="text" name="symbol" /></td></tr>
+	<tr><td>Name</td><td><input type="text" name="name" /></td></tr>
+    <tr><td>*.csv file upload</td><td><input type="file" name="foo" /></td></tr>
+    <tr><td colspan=2><input type="submit" name="button" value="add new stock" /></td></tr>
+    </table></div></form>
+    `;
+	
+	res.send(RenderPage(myform, false));
+});
+
+if (myENV !== "production")
+app.post('/api/add', async (req, res, next) => {
+	try 
+		{
+		let thefile = req.files.foo;
+		let store = __dirname+path.sep+'stocks'+path.sep+req.body.symbol+'.csv';
+
+		console.log(store);
+		thefile.mv(store, function(err) 
+			{
+			if (err)
+			  return res.status(500).send(err);
+			});
+		const db = await dbPromise;
+		await db.all(`INSERT INTO Stocks (symbol, name) VALUES ('${req.body.symbol}', '${req.body.name}')`);
+		res.redirect(`/?stock=${req.body.symbol}`);
+		} 
+  catch (err) 
+	{
+    next(err);
+	}
+});
+
 app.use('/stocks', express.static(__dirname + '/stocks'));
 
-let myENV = process.env.NODE_ENV; // process.argv[2]; // process.env.NODE_ENV=production
 // Serve static files for the React frontend app
 
 if (myENV === "production")

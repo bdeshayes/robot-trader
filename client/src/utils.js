@@ -58,10 +58,10 @@ fetch('/api/name/'+stockSymbol)
 
 document.title = stockSymbol;
 		
-	const promiseSTOCK = fetch('/stocks/'+stockSymbol+'.csv') 
+	const promiseMSFT = fetch('/stocks/'+stockSymbol+'.csv') 
 		.then(response => response.text())
 		.then(data => csvParse(data, parseData(parseDate)))
-	return promiseSTOCK;
+	return promiseMSFT;
 }
 
 export {stockSymbol, stockName};

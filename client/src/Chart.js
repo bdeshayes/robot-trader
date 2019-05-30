@@ -6,6 +6,8 @@ import { timeFormat } from "d3-time-format";
 
 import { ChartCanvas, Chart } from "react-stockcharts";
 import {
+	BarSeries,
+	AreaSeries,
 	CandlestickSeries,
 	LineSeries,
 } from "react-stockcharts/lib/series";
@@ -23,7 +25,7 @@ import {
 	OHLCTooltip,
 	MovingAverageTooltip,
 } from "react-stockcharts/lib/tooltip";
-import { ema } from "react-stockcharts/lib/indicator";
+import { ema, sma } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import algo from "react-stockcharts/lib/algorithm";
 import {
@@ -35,7 +37,7 @@ import {
 import { last } from "react-stockcharts/lib/utils";
 import { JsonToTable } from "react-json-to-table";
 import { stockSymbol } from "./utils";
-
+var csscolors = require('css-color-names');
 var sprintf = require('sprintf-js').sprintf;
 
 var trades = [];
@@ -47,8 +49,6 @@ var urlupdate = '';
 
 class MovingAverageCrossOverAlgorithmV2 extends React.Component {
 	render() {
-		const { type, data: initialData, width, ratio } = this.props;
-
 		const ema20 = ema()
 			.id(0)
 			.options({ windowSize: 13 })
@@ -60,6 +60,13 @@ class MovingAverageCrossOverAlgorithmV2 extends React.Component {
 			.options({ windowSize: 50 })
 			.merge((d, c) => { d.ema50 = c; })
 			.accessor(d => d.ema50);
+
+		const smaVolume50 = sma()
+			.options({ windowSize: 20, sourcePath: "volume" })
+			.merge((d, c) => {d.smaVolume50 = c;})
+			.accessor(d => d.smaVolume50)
+			.stroke("#4682B4")
+			.fill("#4682B4");
 
 		const buySell = algo()
 			.windowSize(2)
@@ -127,7 +134,7 @@ class MovingAverageCrossOverAlgorithmV2 extends React.Component {
 			y: ({ yScale, datum }) => yScale(datum.low),
 			fill: "#0000FF",
 			path: buyPath,
-			tooltip: "Go long", // + datum.date.toDateString() + "\n" + datum.close,
+			tooltip: "Go long", 
 		};
 
 		const shortAnnotationProps = {
@@ -138,22 +145,23 @@ class MovingAverageCrossOverAlgorithmV2 extends React.Component {
 			tooltip: "Go short",
 		};
 
-const candlesAppearance = {
-  wickStroke: "#000000",
-  fill: function fill(d) {
-    return d.close > d.open ? "rgba(255, 255, 255, 0.8)" : "rgba(22, 22, 22, 0.8)";
-  },
-  stroke: "#000000",
-  candleStrokeWidth: 1,
-  widthRatio: 0.8,
-  opacity: 1,
-}
+		const candlesAppearance = {
+			wickStroke: "#000000",
+			fill: function fill(d) {
+			return d.close > d.open ? "rgba(255, 255, 255, 0.8)" : "rgba(22, 22, 22, 0.8)";
+			},
+			stroke: "#000000",
+			candleStrokeWidth: 1,
+			widthRatio: 0.8,
+			opacity: 1,
+		};
+		
 		const margin = { left: 80, right: 80, top: 30, bottom: 50 };
 		const height = 400;
 
-	//	const [yAxisLabelX, yAxisLabelY] = [width - margin.left - 40, margin.top + (height - margin.top - margin.bottom) / 2];
+		const { type, data: initialData, width, ratio } = this.props;
 
-		const calculatedData = buySell(ema50(ema20(initialData)));
+		const calculatedData = buySell(ema20(ema50(smaVolume50(initialData))));
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -166,10 +174,9 @@ const candlesAppearance = {
 		const start = xAccessor(last(data));
 		const end = xAccessor(data[Math.max(0, data.length - 150)]);
 		const xExtents = [start, end];
-		console.log(end);
 		
-var lastpoint = data[data.length-1];
-var firstpoint = data[0];
+		var lastpoint = data[data.length-1];
+		var firstpoint = data[0];
 
 		if (trades.length !== 0)
 			{
@@ -206,23 +213,25 @@ var firstpoint = data[0];
 					ratio={ratio}
 					margin={margin}
 					type={type}
-					seriesName="STOCK"
+					seriesName="MSFT"
 					data={data}
 					xScale={xScale}
 					xAccessor={xAccessor}
 					displayXAccessor={displayXAccessor}
 					xExtents={xExtents}>
-				<Chart id={1}
+{/* 
+  Multi
+  line
+  comment
+*/}  
+					<Chart id={1}
 						yExtents={[d => [d.high, d.low], ema20.accessor(), ema50.accessor()]}
-						padding={{ top: 10, bottom: 20 }}>
+						padding={{ top: 10, bottom: 20 }}
+				>
 					<XAxis axisAt="bottom" orient="bottom"/>
 
 					<YAxis axisAt="right" orient="right" ticks={5} />
-
-					<MouseCoordinateX
-						at="bottom"
-						orient="bottom"
-						displayFormat={timeFormat("%Y-%m-%d")} />
+					<MouseCoordinateX at="bottom" orient="bottom" displayFormat={timeFormat("%Y-%m-%d")} />
 					<MouseCoordinateY
 						at="right"
 						orient="right"
@@ -234,8 +243,7 @@ var firstpoint = data[0];
 
 					<CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
 					<CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
-					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+					<EdgeIndicator itemType="last" orient="right" edgeAt="right"	yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/> 
 
 					<OHLCTooltip origin={[-40, 0]}/>
 					<MovingAverageTooltip
@@ -261,16 +269,36 @@ var firstpoint = data[0];
 						usingProps={longAnnotationProps} />
 					<Annotate with={SvgPathAnnotation} when={d => d.longShort === "SHORT"}
 						usingProps={shortAnnotationProps} />
+					</Chart>
 
+				<Chart id={2}
+					yExtents={[d => d.volume, smaVolume50.accessor()]}
+					height={150} origin={(w, h) => [0, h - 150]}
+				>
+					<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")}/>
+
+					<MouseCoordinateX
+						at="bottom"
+						orient="bottom"
+						displayFormat={timeFormat("%Y-%m-%d")} />
+					<MouseCoordinateY
+						at="left"
+						orient="left"
+						displayFormat={format(".4s")} />
+
+					<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "red"} />
+					<AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
+					<CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
+					<CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
 				</Chart>
 				<CrossHairCursor />
 			</ChartCanvas>
-			<JsonToTable json={trades} />	
-			<p style={{ textAlign: "center" }}>{profitstr} over {nbtrades} trades<br /><a href={urlupdate} >Update results</a> </p>
+			<JsonToTable json={trades} />
+			<p style={{ textAlign: "center", backgroundColor: csscolors.yellow }}>{profitstr} over {nbtrades} trades<br /><a href={urlupdate} >Update results</a> </p>
 			</ div>
-		);
+		)
 	}
-}
+};
 
 /*
 		
