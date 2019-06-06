@@ -18,6 +18,8 @@ They need to use two ports in development which is declared in /client/package.j
 
 You can see robot-trader running here https://robot-trader.herokuapp.com
 
+To run locally you need two powershell windows - one to run the node server with npm start inside /robot-trader and the second to run the react client inside /robot-trader/client
+
 Enjoy -
 
 PS. If you want to impress your dinner guests for your next cocktail party, just remove the worst performing stocks from your stocklist and replace them with some thoroughbreds picked up from the latest trading blogs...
@@ -26,6 +28,6 @@ You may sport a trading system with a success rate above 75% if you try.
 
 Nothing dishonest with that - but the problem is there is no guarantee your stocklist will perform as well next year as it did last year. With the power of hindsight you can always pick the best last performers with technical analysis tools but that does not predict the future. 
 
-One question was - how do you maintain the data? Well, now we have two methods. There is a user interface to add/delete stocks (new sqlite row + relevant *.csv file). login by clicking on the robot-trader logo. New links will appear on the stcklist table.
+One question was - how do you maintain the data? Well, now we have two methods. There is a user interface to add/delete stocks (new sqlite row + relevant *.csv file). login by clicking on the robot-trader logo. New links will appear on the stcklist table. You may want to setup your own password inside the server's index.js
 
 The second automated method is to run node scraper.js which will read the file stocklist.txt and download data from yahoo.
