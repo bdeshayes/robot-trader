@@ -444,8 +444,9 @@ app.get('/api/results/:column/:order', async (req, res, next) => {
   }
 });
 
-if ((myENV !== "production") || (req.cookies.username !== undefined))
 app.get('/api/delete/:stock', async (req, res, next) => {
+if ((myENV !== "production") || (req.cookies.username !== undefined))
+	{
 	try 
 		{
 		const db = await dbPromise;
@@ -459,15 +460,17 @@ app.get('/api/delete/:stock', async (req, res, next) => {
 		
 		res.send(RenderPage(RenderTable(stocks,req)));
 		} 
-  catch (err) 
-	{
-    next(err);
+	catch (err) 
+		{
+		next(err);
+		}
 	}
 });
 
-if ((myENV !== "production") || (req.cookies.username !== undefined))
 app.get('/api/add', async (req, res, next) => {
-   const myform = `
+if ((myENV !== "production") || (req.cookies.username !== undefined))
+	{
+	const myform = `
     <form "fileupload" action="/api/add" method="post" enctype="multipart/form-data">
     <div  id="tablehead" >
 	<h2>Adding a new item to your stocklist</h2>
@@ -481,10 +484,12 @@ app.get('/api/add', async (req, res, next) => {
     `;
 	
 	res.send(RenderPage(myform, false));
+	}
 });
 
-if ((myENV !== "production") || (req.cookies.username !== undefined))
 app.post('/api/add', async (req, res, next) => {
+if ((myENV !== "production") || (req.cookies.username !== undefined))
+	{
 	try 
 		{
 		let thefile = req.files.foo;
@@ -500,9 +505,10 @@ app.post('/api/add', async (req, res, next) => {
 		await db.all(`INSERT INTO Stocks (symbol, name) VALUES ('${req.body.symbol}', '${req.body.name}')`);
 		res.redirect(`/?stock=${req.body.symbol}`);
 		} 
-  catch (err) 
-	{
-    next(err);
+	catch (err) 
+		{
+		next(err);
+		}
 	}
 });
 
