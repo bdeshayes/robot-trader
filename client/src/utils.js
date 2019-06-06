@@ -3,6 +3,13 @@ import { timeParse } from "d3-time-format";
 
 var stockSymbol;
 var stockName;
+export {stockSymbol, stockName};
+
+//##################################################
+//#                                                #
+//# parseData                                      #
+//#                                                #
+//##################################################
 
 function parseData(parse) {
 	return function(d) {
@@ -18,6 +25,12 @@ function parseData(parse) {
 
 const parseDate = timeParse("%Y-%m-%d");
 
+//##################################################
+//#                                                #
+//# getUrlVars                                     #
+//#                                                #
+//##################################################
+
 function getUrlVars() {
     var vars = {};
     /*var parts = */window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
@@ -25,6 +38,13 @@ function getUrlVars() {
     });
     return vars;
 }
+
+//##################################################
+//#                                                #
+//# getUrlParam                                    #
+//#                                                #
+//##################################################
+
 function getUrlParam(parameter, defaultvalue){
     var urlparameter = defaultvalue;
     if(window.location.href.indexOf(parameter) > -1){
@@ -33,35 +53,29 @@ function getUrlParam(parameter, defaultvalue){
     return urlparameter;
 }
 
-export function getData() 
-{
-stockSymbol = getUrlParam('stock','AAPL');
+//##################################################
+//#                                                #
+//# getData                                        #
+//#                                                #
+//##################################################
 
-fetch('/api/name/'+stockSymbol)
-  .then(
-    function(response) {
-      if (response.status !== 200) {
-        console.log('Looks like there was a problem. Status Code: ' + response.status);
-        return;
-      }
+export const getData = async () => {
+stockSymbol = getUrlParam('stock','random');
+console.log('stockSymbol='+stockSymbol);
+const mystock = await fetch('/api/name/'+stockSymbol)
+const json = await mystock.json();
 
-      // Examine the text in the response
-      response.json().then(function(data) 
-	  {
-		stockName = data.name;
-      });
-    }
-  )
-  .catch(function(err) {
-    console.log('Fetch Error :-S', err);
-  });
-
+console.log(json);
+stockSymbol = json.symbol;
+stockName = json.name;
 document.title = stockSymbol;
-		
-	const promiseMSFT = fetch('/stocks/'+stockSymbol+'.csv') 
-		.then(response => response.text())
-		.then(data => csvParse(data, parseData(parseDate)))
-	return promiseMSFT;
-}
 
-export {stockSymbol, stockName};
+console.log('fetching '+stockSymbol);
+const mydata = await fetch('/stocks/'+stockSymbol+'.csv') 
+const text = await mydata.text();
+
+var retval = csvParse(text, parseData(parseDate));
+console.log('retval');
+console.log(retval);
+return retval;
+}

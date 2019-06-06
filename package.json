@@ -5,12 +5,22 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
     "ejs": "^2.6.1",
     "express": "^4.15.3",
     "express-fileupload": "^1.1.4",
+    "express-session": "^1.16.1",
     "fs": "0.0.1-security",
+    "fs-extra": "^8.0.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "password-hash": "^1.2.2",
+    "puppeteer": "^1.17.0",
+    "sprintf": "^0.1.5",
+    "sprintf-js": "^1.1.2",
     "sqlite": "^3.0.3"
   },
+  "comments": "concurrently \"npm start\" \"cd client\" \"npm start\"",
   "scripts": {
     "start": "node index.js",
     "heroku-postbuild": "cd client && npm install && npm run build"
