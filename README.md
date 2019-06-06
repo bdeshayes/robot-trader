@@ -24,4 +24,8 @@ PS. If you want to impress your dinner guests for your next cocktail party, just
 
 You may sport a trading system with a success rate above 75% if you try.
 
-Nothing dishonest with that - but the problem is there is no guarantee your stocklist will perform as well next year as it did last year. With the power of hindsight you can always pick the best last performers with technical analysis tools but that does not predict the future. Remeber the market is a zero sum game. There needs to be a lot of small losers for a very few big winners who can manipulate things.
+Nothing dishonest with that - but the problem is there is no guarantee your stocklist will perform as well next year as it did last year. With the power of hindsight you can always pick the best last performers with technical analysis tools but that does not predict the future. 
+
+One question was - how do you maintain the data? Well, now we have two methods. There is a user interface to add/delete stocks (new sqlite row + relevant *.csv file). login by clicking on the robot-trader logo. New links will appear on the stcklist table.
+
+The second automated method is to run node scraper.js which will read the file stocklist.txt and download data from yahoo.
