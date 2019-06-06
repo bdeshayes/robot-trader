@@ -30,4 +30,4 @@ Nothing dishonest with that - but the problem is there is no guarantee your stoc
 
 One question was - how do you maintain the data? Well, now we have two methods. There is a user interface to add/delete stocks (new sqlite row + relevant *.csv file). login by clicking on the robot-trader logo. New links will appear on the stcklist table. You may want to setup your own password inside the server's index.js
 
-The second automated method is to run node scraper.js which will read the file stocklist.txt and download data from yahoo.
+The second automated method is to run node scraper.js in a third powershell window which will read the file stocklist.txt and download data from yahoo.It will automatically click the link "Update Results" at the bottom of your localhost:3000 react client browser to tally all the stocks performance back into the SQLite database. Nifty huh?
