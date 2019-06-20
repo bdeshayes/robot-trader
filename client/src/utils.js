@@ -12,14 +12,22 @@ export {stockSymbol, stockName};
 //##################################################
 
 function parseData(parse) {
-	return function(d) {
-		d.date = parse(d.Date);
-		d.open = +d.Open; // coerce strings to numbers
-		d.high = +d.High;
-		d.low = +d.Low;
-		d.close = +d.Close; // Date,Open,High,Low,Close,Adj Close,Volume
-		d.volume = +d.Volume; // convert header row to lowercase column names
-		return d;
+	return function(d) 
+	{
+	d.date = parse(d.Date);
+	d.open = +d.Open; // coerce strings to numbers
+	d.high = +d.High;
+	d.low = +d.Low;
+	d.close = +d.Close; // Date,Open,High,Low,Close,Adj Close,Volume
+	d.volume = +d.Volume; // convert header row to lowercase column names	
+	
+	delete d.Date;
+	delete d.Open; 
+	delete d.High;
+	delete d.Low;
+	delete d.Close; 
+	delete d.Volume; // remove duplicate uppercase column names	from *.csv file
+	return d;
 	};
 }
 
